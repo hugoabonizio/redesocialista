@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-private xmlns="http://www.netbeans.org/ns/project-private/1">
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
+    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
+        <group>
+            <file>file:/home/hugo/NetBeansProjects/projeto_bd/web/views/message/comments.jsp</file>
+            <file>file:/home/hugo/NetBeansProjects/projeto_bd/src/java/models/User.java</file>
+            <file>file:/home/hugo/NetBeansProjects/projeto_bd/web/assets/js/message.js</file>
+            <file>file:/home/hugo/NetBeansProjects/projeto_bd/src/java/libs/ActiveRecord.java</file>
+            <file>file:/home/hugo/NetBeansProjects/projeto_bd/src/java/controllers/_TODO</file>
+            <file>file:/home/hugo/NetBeansProjects/projeto_bd/web/views/user/login.jsp</file>
+            <file>file:/home/hugo/NetBeansProjects/projeto_bd/src/java/controllers/MessageController.java</file>
+            <file>file:/home/hugo/NetBeansProjects/projeto_bd/src/java/models/Comment.java</file>
+            <file>file:/home/hugo/NetBeansProjects/projeto_bd/src/java/models/Message.java</file>
+            <file>file:/home/hugo/NetBeansProjects/projeto_bd/src/java/models/Group.java</file>
+            <file>file:/home/hugo/NetBeansProjects/projeto_bd/src/java/controllers/UserController.java</file>
+            <file>file:/home/hugo/NetBeansProjects/projeto_bd/web/views/user/show.jsp</file>
+            <file>file:/home/hugo/NetBeansProjects/projeto_bd/web/index.jsp</file>
+            <file>file:/home/hugo/NetBeansProjects/projeto_bd/src/java/controllers/GroupController.java</file>
+            <file>file:/home/hugo/NetBeansProjects/projeto_bd/src/java/controllers/OpinionController.java</file>
+            <file>file:/home/hugo/NetBeansProjects/projeto_bd/src/java/controllers/FollowController.java</file>
+            <file>file:/home/hugo/NetBeansProjects/projeto_bd/src/java/models/MessagePOJO.java</file>
+            <file>file:/home/hugo/NetBeansProjects/projeto_bd/web/views/message/index.jsp</file>
+            <file>file:/home/hugo/NetBeansProjects/projeto_bd/web/assets/css/style.css</file>
+            <file>file:/home/hugo/NetBeansProjects/projeto_bd/src/java/models/Follow.java</file>
+            <file>file:/home/hugo/NetBeansProjects/projeto_bd/src/java/models/Like.java</file>
+            <file>file:/home/hugo/NetBeansProjects/projeto_bd/web/partials/_message.jsp</file>
+            <file>file:/home/hugo/NetBeansProjects/projeto_bd/web/assets/js/script.js</file>
+        </group>
+    </open-files>
+</project-private>

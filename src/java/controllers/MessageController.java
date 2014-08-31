@@ -127,7 +127,7 @@ public class MessageController extends HttpServlet {
                 message.setUser_id((int) req.getSession().getAttribute("user_id"));
                 message.setOriginal_user_id((int) req.getSession().getAttribute("user_id"));
                 try {
-                    message.save();
+                    message.save(true);
                     req.setAttribute("messageResult", true);
                 } catch (Exception ex) {
                     req.setAttribute("messageResult", false);

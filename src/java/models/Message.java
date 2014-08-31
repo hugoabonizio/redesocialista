@@ -3,9 +3,14 @@ package models;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import libs.ActiveRecord;
 import static libs.ActiveRecord.conn;
 
@@ -59,6 +64,32 @@ public class Message extends ActiveRecord {
             messages_cast.add(new MessagePOJO((Message) obj, likes));
         }
         return messages_cast;
+    }
+    
+    public void after() {
+        PreparedStatement stmt;
+        try {
+            stmt = conn.prepareStatement("DELETE FROM hashtag WHERE message_id = ?;");
+            stmt.setInt(1, id);
+            stmt.execute();
+            
+            Pattern p = Pattern.compile("\\B#\\w*[a-zA-Z]+\\w*");
+            Matcher m = p.matcher(body);
+            while (m.find()) {
+                System.out.println(m.group());
+                String hashtag = m.group().substring(1);
+                stmt = conn.prepareStatement("INSERT INTO hashtag (tag, message_id) VALUES (?, ?);");
+                stmt.setString(1, hashtag);
+                stmt.setInt(2, id);
+                System.out.println(stmt);
+                try {
+                    stmt.execute();
+                } catch (Exception ex) {}
+            }
+            
+        } catch (SQLException ex) {
+        }
+        
     }
 
     public int getId() {

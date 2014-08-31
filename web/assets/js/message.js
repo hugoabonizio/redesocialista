@@ -38,10 +38,16 @@ $('.load-comments').click(function(e){
 });
 
 
-function replaceAtMentionsWithLinks(text) {
+function replaceMentionsWithLinks(text) {
     return text.replace(/@([a-z\d_]+)/ig, '<a href="http://localhost:8084/projeto_bd/find?search=$1">@$1</a>'); 
 }
+
+function replaceHashtagWithLinks(text) {
+    return text.replace(/#([a-z0-9][a-z0-9\-_]*)/ig, '<a href="http://localhost:8084/projeto_bd/hashtag?hash=$1">#$1</a>'); 
+}
+
 var comments = document.getElementsByClassName('comment-itself');
 for (var i = 0; i < comments.length; i++) {
-    comments[i].innerHTML = replaceAtMentionsWithLinks(comments[i].innerHTML);
+    comments[i].innerHTML = replaceMentionsWithLinks(comments[i].innerHTML);
+    comments[i].innerHTML = replaceHashtagWithLinks(comments[i].innerHTML);
 }

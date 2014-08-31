@@ -8,6 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -73,10 +74,15 @@ public class ActiveRecord<T> {
     }
     
     
+    // Um alias pra default ser returnGeneratedKeys falso
+    public void save() throws Exception {
+        save(false);
+    }
+    
     // Persiste no banco de dados, sendo INSERT se o
     // atributo "exists" for TRUE, ou UPDATE se o atributo
     // for FALSE
-    public void save() throws Exception {
+    public void save(boolean returnGeneratedKeys) throws Exception {
         if (validate()) {
             String query;
             if (exists) {
@@ -126,7 +132,7 @@ public class ActiveRecord<T> {
                 
                 System.out.println(query);
                 
-                PreparedStatement stmt = conn.prepareStatement(query);
+                PreparedStatement stmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 
                 // Agora os valores
                 fields = this.getClass().getDeclaredFields();
@@ -152,7 +158,28 @@ public class ActiveRecord<T> {
                 System.out.println("executou");
                 System.out.println("query: " + stmt);
                 stmt.execute();
+                
+                if (returnGeneratedKeys) {
+                    ResultSet generatedKeys = stmt.getGeneratedKeys();
+                    if (generatedKeys.next()) {
+                        System.out.println(generatedKeys.getInt(1));
+                        fields = this.getClass().getDeclaredFields();
+                        i = 0;
+                        for (Field field : fields) {
+                            Field f = this.getClass().getDeclaredField(field.getName());
+                            f.setAccessible(true);
+                            if (f.get(this) != null && field.getName() == "id") {
+                                System.out.println("id: " + generatedKeys.getInt(1));
+                                f.set(this, generatedKeys.getInt(1));
+                            }
+                        }
+                    }
+                }
+                
             }
+            
+            // Executa a função que vem depois de tudo
+            after();
 
             //conn.createStatement().execute(query);
         } else {
@@ -265,8 +292,18 @@ public class ActiveRecord<T> {
         save();
     }
     
+    
+    // Executa antes de salvar, para validações
+    // ou outros tratamentos
     public boolean validate() {
         return true;
+    }
+    
+    // Executa depois da inserção, para
+    // manipulação dos dados depois de ter o
+    // id, por exemplo
+    public void after() {
+        
     }
     
     public int count() throws Exception {

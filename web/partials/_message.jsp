@@ -21,7 +21,7 @@
 
         <span class="pull-right">
 
-            <c:if test="${not me}">
+            <c:if test="${sessionScope.user_id != m.message.user_id}">
                 <div class="dropdown">
                     <button class="btn btn-default dropdown-toggle opinion" type="button" id="dropdownMenu1" data-toggle="dropdown" data-id="${m.message.id}">
                         <i class="glyphicon glyphicon-cog"></i>

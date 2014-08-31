@@ -43,7 +43,7 @@ function replaceMentionsWithLinks(text) {
 }
 
 function replaceHashtagWithLinks(text) {
-    return text.replace(/#([a-z0-9][a-z0-9\-_]*)/ig, '<a href="http://localhost:8084/projeto_bd/hashtag?hash=$1">#$1</a>'); 
+    return text.replace(/#([a-z0-9][a-z0-9\-_]*)/ig, '<a href="http://localhost:8084/projeto_bd/hashtag?tag=$1">#$1</a>'); 
 }
 
 var comments = document.getElementsByClassName('comment-itself');

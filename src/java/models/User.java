@@ -55,6 +55,55 @@ public class User extends ActiveRecord {
     }
     
     
+    
+    public String advancedSearchQuery(List<String> mentions, List<String> hashtags) {
+        //String query = "SELECT original_user_id, body, login, description, birth FROM \n" +
+        String query = "SELECT m.id FROM \n" +
+"	hashtag AS h, message AS m, \"user\" AS u, \"group\" AS g\n" +
+"	WHERE\n" +
+"	m.id = h.message_id\n" +
+"	AND u.id = original_user_id\n AND ";
+        
+        int i;
+        
+        if (mentions.size() > 0) {
+            // mentions
+            i = 0;
+            query += "(";
+            for (String mention: mentions) {
+                if (i > 0) {
+                    query += " OR ";
+                }
+                i++;
+                query += "u.login = \'" + mention + "\' OR g.name = \'" + mention + "\'";
+            }
+            query += ")";
+        }
+        
+        if (mentions.size() > 0 && hashtags.size() > 0) {
+            query += " AND ";
+        }
+        
+        if (hashtags.size() > 0) {
+            // hashtags
+            i = 0;
+            query += "(";
+            for (String hashtag: hashtags) {
+                if (i > 0) {
+                    query += " OR ";
+                }
+                i++;
+                query += "h.tag = \'" + hashtag + "\'";
+            }
+            query += ")";
+        }
+        
+        System.out.println(query);
+        return query;
+        
+    }
+    
+    
     public int getId() {
         return id;
     }

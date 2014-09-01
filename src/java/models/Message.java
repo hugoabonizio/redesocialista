@@ -126,8 +126,29 @@ public class Message extends ActiveRecord {
                 System.out.println(ex.getMessage());
             }
         }
+    }
     
+    
+    public List<MessagePOJO> getMessagesAdvanced(String query) throws Exception {
+        List<Object> messages = new ArrayList<Object>();
+        where("id IN (" + query + ")").transfer(messages);
         
+        List<MessagePOJO> messages_cast = new ArrayList<MessagePOJO>();
+        
+        for (Object obj: messages) {
+            int likes;
+            PreparedStatement stmt = conn.prepareStatement("SELECT sum(\"value\") AS sum_result FROM \"like\" WHERE message_id = ?;");
+            stmt.setInt(1, ((Message) obj).getId());
+            ResultSet result = stmt.executeQuery();
+
+            if (result.next()) {
+                likes = result.getInt("sum_result");
+            } else {
+                likes = 0;
+            }
+            messages_cast.add(new MessagePOJO((Message) obj, likes));
+        }
+        return messages_cast;
     }
     
     

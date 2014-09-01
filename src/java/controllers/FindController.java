@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -13,11 +15,14 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import models.Group;
+import models.Message;
+import models.MessagePOJO;
 import models.User;
 
 @WebServlet(urlPatterns = {
     "/find",
-    "/search"
+    "/search",
+    "/advanced_search"
 })
 public class FindController extends HttpServlet {
 
@@ -98,6 +103,41 @@ public class FindController extends HttpServlet {
                 dispatcher = req.getRequestDispatcher("/views/find/users.jsp");
                 dispatcher.forward(req, res);
                 
+                break;
+                
+            case "/advanced_search":
+                String search = req.getParameter("search");
+                
+                List<String> mentions = new ArrayList<String>();
+                List<String> hashtags = new ArrayList<String>();
+                
+                Pattern p = Pattern.compile("@([a-z\\d_]+)");
+                Matcher m = p.matcher(search);
+                System.out.println("mentions:");
+                while (m.find()) {
+                    mentions.add(m.group().substring(1));
+                    System.out.println(m.group());
+                }
+                
+                p = Pattern.compile("\\B#\\w*[a-zA-Z]+\\w*");
+                m = p.matcher(search);
+                System.out.println("hashtags:");
+                while (m.find()) {
+                    hashtags.add(m.group().substring(1));
+                    System.out.println(m.group());
+                }
+                
+                user = new User();
+                List<MessagePOJO> messages = null;
+                try {
+                    messages = (new Message()).getMessagesAdvanced(user.advancedSearchQuery(mentions, hashtags));
+                } catch (Exception ex) {
+                    System.out.println(ex.getMessage());
+                }
+                req.setAttribute("messageList", messages);
+                
+                dispatcher = req.getRequestDispatcher("/views/find/advanced_search.jsp");
+                dispatcher.forward(req, res);
                 break;
         }
     }

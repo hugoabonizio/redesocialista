@@ -99,3 +99,9 @@ $('.unfollow').click(function(e) {
     });
     
 });
+
+document.getElementById('avanced-search-button').onclick = function (e) {
+    e.preventDefault();
+    document.forms[0].action = 'advanced_search';
+    document.forms[0].submit();
+};

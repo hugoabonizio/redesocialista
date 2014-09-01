@@ -46,8 +46,29 @@ function replaceHashtagWithLinks(text) {
     return text.replace(/#([a-z0-9][a-z0-9\-_]*)/ig, '<a href="http://localhost:8084/projeto_bd/hashtag?tag=$1">#$1</a>'); 
 }
 
+function replaceVideoTags(text) {
+    return text.replace(/\$v:\"(.*?)\"/, '<video width="320" height="240" controls><source src="$1"></video>'); 
+}
+
+function replaceImageTags(text) {
+    return text.replace(/\$i:\"(.*?)\"/, '<img src="$1" class="embed-image" />'); 
+}
+
+function replaceLinkTags(text) {
+    return text.replace(/\$l:\"(.*?)\"/, '<a href="$1">$1</a>'); 
+}
+
+function replaceYoutubeTags(text) {
+    return text.replace(/\$y:\"(.*?)\"/, '<iframe width="320" height="240" src="//www.youtube.com/embed/$1" frameborder="0" allowfullscreen></iframe>'); 
+}
+
+
 var comments = document.getElementsByClassName('comment-itself');
 for (var i = 0; i < comments.length; i++) {
     comments[i].innerHTML = replaceMentionsWithLinks(comments[i].innerHTML);
     comments[i].innerHTML = replaceHashtagWithLinks(comments[i].innerHTML);
+    comments[i].innerHTML = replaceVideoTags(comments[i].innerHTML);
+    comments[i].innerHTML = replaceImageTags(comments[i].innerHTML);
+    comments[i].innerHTML = replaceLinkTags(comments[i].innerHTML);
+    comments[i].innerHTML = replaceYoutubeTags(comments[i].innerHTML);
 }

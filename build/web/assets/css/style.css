@@ -37,3 +37,7 @@ a {
 .comment {
     margin-bottom: 15px;
 }
+
+.embed-image {
+    max-width: 100px;
+}

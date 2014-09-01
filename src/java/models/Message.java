@@ -115,7 +115,24 @@ public class Message extends ActiveRecord {
         } catch (SQLException ex) {
         }
         
+        
+        // Ao fazer update, atualizar as
+        // republicações dessa mensagem
+        if (exists()) {
+            try {
+                stmt = conn.prepareStatement("UPDATE \"message\" SET body = \'" + body + "\' WHERE original_message_id = " + id);
+                stmt.execute();
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+    
+        
     }
+    
+    
+    
+            
 
     public int getId() {
         return id;

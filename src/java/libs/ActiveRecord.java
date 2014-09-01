@@ -85,7 +85,7 @@ public class ActiveRecord<T> {
     public void save(boolean returnGeneratedKeys) throws Exception {
         if (validate()) {
             String query;
-            if (exists) {
+            if (exists()) {
                 query = "UPDATE " + table + " SET ";
                 Field[] fields = this.getClass().getDeclaredFields();
                 for (Field field : fields) {
@@ -265,7 +265,7 @@ public class ActiveRecord<T> {
     // estar atribuído, pela lógica, já que o objeto já
     // está persistido no banco de dados
     public boolean destroy() throws NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
-        if (exists) {
+        if (exists()) {
             Field f;
             try (PreparedStatement stmt = conn.prepareStatement("DELETE FROM " + table + " WHERE id = ?;");) {
                 f = this.getClass().getDeclaredField("id");
@@ -324,6 +324,10 @@ public class ActiveRecord<T> {
             }
         }
         return count;
+    }
+
+    public boolean exists() {
+        return exists;
     }
     
 }

@@ -21,7 +21,8 @@
                     <li class="nav-1"><a href="${pageContext.servletContext.contextPath}/welcome">Início</a></li>
                     <li class="nav-2"><a href="${pageContext.servletContext.contextPath}/me">Perfil</a></li>
                     <li class="nav-3"><a href="${pageContext.servletContext.contextPath}/groups">Grupos</a></li>
-                    <li class="nav-4"><a href="${pageContext.servletContext.contextPath}/logout">Sair</a></li>
+                    <li class="nav-4"><a href="${pageContext.servletContext.contextPath}/search">Busca</a></li>
+                    <li class="nav-5"><a href="${pageContext.servletContext.contextPath}/logout">Sair</a></li>
                 </ul>
                 <hr style="margin-bottom: 70px;">
             </c:if>

@@ -40,6 +40,21 @@ public class User extends ActiveRecord {
     }
     
     
+    public List<User> search(String term) throws Exception {
+        String where = "name ILIKE \'%" + term + "%\' OR login ILIKE \'%" + term + "%\'";
+        
+        List<Object> users = new ArrayList<Object>();
+        User user = new User();
+        user.where(where).transfer(users);
+        
+        List<User> users_cast = new ArrayList<User>();
+        for (Object obj: users) {
+            users_cast.add((User) obj);
+        }
+        return users_cast;
+    }
+    
+    
     public int getId() {
         return id;
     }

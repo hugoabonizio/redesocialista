@@ -16,7 +16,8 @@ import models.Group;
 import models.User;
 
 @WebServlet(urlPatterns = {
-    "/find"
+    "/find",
+    "/search"
 })
 public class FindController extends HttpServlet {
 
@@ -62,6 +63,41 @@ public class FindController extends HttpServlet {
                 // Não achou
                 dispatcher = req.getRequestDispatcher("/views/find/not_found.jsp");
                 dispatcher.forward(req, res);
+                break;
+                
+            case "/search":
+                dispatcher = req.getRequestDispatcher("/views/find/index.jsp");
+                dispatcher.forward(req, res);
+                break;
+        }
+    }
+    
+    
+    protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+        // Verifica se tá logado
+        if (req.getSession().getAttribute("user") == null) {
+            res.sendRedirect(req.getContextPath() + "/");
+            return;
+        }
+        
+        RequestDispatcher dispatcher;
+        User user;
+        
+        switch (req.getServletPath()) {
+            case "/search":
+                user = new User();
+                List<User> users = null;
+                try {
+                    users = user.search(req.getParameter("search"));
+                } catch (Exception ex) {
+                    System.out.println(ex.getMessage());
+                }
+                
+                req.setAttribute("userList", users);
+                
+                dispatcher = req.getRequestDispatcher("/views/find/users.jsp");
+                dispatcher.forward(req, res);
+                
                 break;
         }
     }

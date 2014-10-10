@@ -6,6 +6,7 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import libs.ActiveRecord;
@@ -16,8 +17,9 @@ public class User extends ActiveRecord {
     private String name;
     private String password;
     private String description;
-    private String origin;
+    private int server_id;
     private Date birth;
+    private Timestamp created_at;
 
     
     public boolean authenticate() {
@@ -103,6 +105,18 @@ public class User extends ActiveRecord {
         
     }
     
+    public List<User> getTop20(String to, String from) throws Exception { // format YYYY-MM-DD HH24:MI:SS
+        List<Object> users = new ArrayList<Object>();
+        User user = new User();
+        order("calc_influence(id, '" + to + "', '" + from + "') DESC").transfer(users);
+        
+        List<User> users_cast = new ArrayList<User>();
+        for (Object obj: users) {
+            users_cast.add((User) obj);
+        }
+        return users_cast;
+    }
+    
     
     public int getId() {
         return id;
@@ -158,11 +172,18 @@ public class User extends ActiveRecord {
         this.description = description;
     }
 
-    public String getOrigin() {
-        return origin;
+    public int getServer_id() {
+        return server_id;
     }
-    public void setOrigin(String origin) {
-        this.origin = origin;
+    public void setServer_id(int server_id) {
+        this.server_id = server_id;
+    }
+
+    public Timestamp getCreated_at() {
+        return created_at;
+    }
+    public void setCreated_at(Timestamp created_at) {
+        this.created_at = created_at;
     }
 
     

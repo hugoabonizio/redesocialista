@@ -3,16 +3,21 @@ package controllers;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import models.Stats;
 import models.User;
 
 @WebServlet(urlPatterns = {
-    "/stats"
+    "/stats",
+    "/stats/top20users"
 })
 public class StatsController extends HttpServlet {
 
@@ -33,6 +38,33 @@ public class StatsController extends HttpServlet {
             case "/stats":
                 req.setAttribute("current_page", current_page);
                 dispatcher = req.getRequestDispatcher("/views/stats/index.jsp");
+                dispatcher.forward(req, res);
+                break;
+        }
+    }
+    
+    protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+        
+        // Verifica se tá logado
+        if (req.getSession().getAttribute("user") == null) {
+            res.sendRedirect(req.getContextPath() + "/");
+            return;
+        }
+        
+        RequestDispatcher dispatcher;
+        User user;
+        
+        switch (req.getServletPath()) {
+            case "/stats/top20users":
+                Stats s = new Stats();
+                try {
+                    req.setAttribute("users", s.getTop20Users(req.getParameter("from"), req.getParameter("to")));
+                } catch (SQLException ex) {
+                    Logger.getLogger(StatsController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
+                req.setAttribute("current_page", current_page);
+                dispatcher = req.getRequestDispatcher("/views/stats/top20users.jsp");
                 dispatcher.forward(req, res);
                 break;
         }

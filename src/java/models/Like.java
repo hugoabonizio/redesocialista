@@ -3,12 +3,14 @@ package models;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import libs.*;
 
 public class Like extends ActiveRecord {
     private int message_id;
     private int user_id;
     private int value;
+    private Timestamp created_at;
     
     public void like() throws SQLException {
         value = 1;

@@ -46,7 +46,11 @@ public class Message extends ActiveRecord {
     
     public List<MessagePOJO> getMessagesFrom(int user_id, int offset) throws ClassNotFoundException, Exception {
         List<Object> messages = new ArrayList<Object>();
-        where("user_id = " + user_id).order("message_date DESC").limit(15 * offset).transfer(messages);
+        if (user_id < 0) {
+            where("1=1").order("message_date DESC").transfer(messages);
+        } else {
+            where("user_id = " + user_id).order("message_date DESC").limit(15 * offset).transfer(messages);
+        }
         
         List<MessagePOJO> messages_cast = new ArrayList<MessagePOJO>();
         

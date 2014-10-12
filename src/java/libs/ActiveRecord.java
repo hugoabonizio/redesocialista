@@ -76,13 +76,18 @@ public class ActiveRecord<T> {
     
     // Um alias pra default ser returnGeneratedKeys falso
     public void save() throws Exception {
-        save(false);
+        save(false, false);
+    }
+    
+    // Um alias pra default ser withID falso
+    public void save(boolean returnGeneratedKeys) throws Exception {
+        save(returnGeneratedKeys, false);
     }
     
     // Persiste no banco de dados, sendo INSERT se o
     // atributo "exists" for TRUE, ou UPDATE se o atributo
     // for FALSE
-    public void save(boolean returnGeneratedKeys) throws Exception {
+    public void save(boolean returnGeneratedKeys, boolean withID) throws Exception {
         if (validate()) {
             String query;
             if (exists()) {
@@ -111,7 +116,7 @@ public class ActiveRecord<T> {
                 for (Field field : fields) {
                     Field f = this.getClass().getDeclaredField(field.getName());
                     f.setAccessible(true);
-                    if (f.get(this) != null && field.getName() != "id") {
+                    if (f.get(this) != null && (withID || field.getName() != "id")) {
                         query += field.getName() + ",";
                     }
                 }
@@ -122,7 +127,7 @@ public class ActiveRecord<T> {
                 for (Field field : fields) {
                     Field f = this.getClass().getDeclaredField(field.getName());
                     f.setAccessible(true);
-                    if (f.get(this) != null && field.getName() != "id") {
+                    if (f.get(this) != null && (withID || field.getName() != "id")) {
                         //query += "'" + f.get(this) + "',";
                         query += "?,";
                     }
@@ -140,7 +145,7 @@ public class ActiveRecord<T> {
                 for (Field field : fields) {
                     Field f = this.getClass().getDeclaredField(field.getName());
                     f.setAccessible(true);
-                    if (f.get(this) != null && field.getName() != "id") {
+                    if (f.get(this) != null && (withID || field.getName() != "id")) {
                         i++;
                         if (field.getType() == int.class) {
                             stmt.setInt(i, (int) f.get(this));
@@ -203,9 +208,9 @@ public class ActiveRecord<T> {
         return this;
     }
     
-    public ActiveRecord all() {
+    /*public ActiveRecord all() {
         return this;
-    }    
+    }*/
     
     public void transfer(List<Object> list) throws SQLException, ClassNotFoundException, Exception {
         String query = "SELECT * FROM " + table + " ";

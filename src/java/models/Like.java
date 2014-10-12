@@ -4,6 +4,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 import libs.*;
 
 public class Like extends ActiveRecord {
@@ -20,6 +22,24 @@ public class Like extends ActiveRecord {
     public void dislike() throws SQLException {
         value = -1;
         save();
+    }
+    
+    public List<Like> all() throws Exception {
+        List<Object> likes = new ArrayList<Object>();
+        
+        try {
+            transfer(likes);
+
+            List<Like> likes_cast = new ArrayList<Like>();
+            for (Object obj: likes) {
+                likes_cast.add((Like) obj);
+            }
+            return likes_cast;
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+        return null;
+        
     }
     
     public boolean hasLike(int message_id, int user_id) throws SQLException {
@@ -44,7 +64,7 @@ public class Like extends ActiveRecord {
         PreparedStatement stmt = conn.prepareStatement("INSERT INTO \"like\" (message_id, user_id, value) VALUES (?, ?, ?)");
         stmt.setInt(1, message_id);
         stmt.setInt(2, user_id);
-        stmt.setInt(3, value);
+        stmt.setInt(3, getValue());
         System.out.println("INSERT INTO like (message_id, user_id, value) VALUES (?, ?, ?)");
         stmt.execute();
     }
@@ -61,5 +81,13 @@ public class Like extends ActiveRecord {
     }
     public void setUser_id(int user_id) {
         this.user_id = user_id;
+    }
+
+    public int getValue() {
+        return value;
+    }
+
+    public Timestamp getCreated_at() {
+        return created_at;
     }
 }

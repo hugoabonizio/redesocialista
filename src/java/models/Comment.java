@@ -11,6 +11,7 @@ public class Comment extends ActiveRecord {
     private int user_id;
     private String body;
     private Timestamp comment_date;
+    private int server_id;
 
     public List<Comment> getComments(String message_id) throws Exception {
         List<Object> comments = new ArrayList<Object>();
@@ -53,6 +54,10 @@ public class Comment extends ActiveRecord {
     }
     public void setBody(String body) {
         this.body = body;
+    }
+
+    public Timestamp getComment_date() {
+        return comment_date;
     }
     
 }

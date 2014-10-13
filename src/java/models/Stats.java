@@ -31,4 +31,26 @@ public class Stats extends ActiveRecord {
         }
         return users;
     }
+    
+    public List<Message> getTop20Messages(String from, String to) throws SQLException {
+        List<Message> messages = new LinkedList<>();
+        Message message;
+        try (PreparedStatement stmt = conn.prepareStatement("SELECT SUBSTRING(body, 0, 20) AS body, calc_impact(id, ?, ?) AS impact "
+                + "FROM \"message\" ORDER BY calc_impact(id, ?, ?) DESC LIMIT 20");) {
+            stmt.setString(1, from);
+            stmt.setString(2, to);
+            stmt.setString(3, from);
+            stmt.setString(4, to);
+            System.out.println(stmt.toString());
+            try (ResultSet result = stmt.executeQuery();) {
+                while (result.next()) {
+                    message = new Message();
+                    message.setBody(result.getString("body"));
+                    message.setId(result.getInt("impact"));
+                    messages.add(message);
+                }
+            }
+        }
+        return messages;
+    }
 }

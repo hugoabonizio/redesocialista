@@ -16,6 +16,13 @@
         <input class="form-control" name="to" placeholder="YYYY-MM-DD HH24:MI:SS">
         <button class="btn btn-primary">Top 20 publicações</button>
     </form>
+        
+    <hr>
+        
+    <form class="col-md-4 col-center" action="${pageContext.servletContext.contextPath}/stats/influence" method="post">
+        <input class="form-control" name="user" placeholder="ID do usuário">
+        <button class="btn btn-primary">Zona de influencia</button>
+    </form>
     
     
     

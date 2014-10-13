@@ -18,7 +18,8 @@ import models.User;
 @WebServlet(urlPatterns = {
     "/stats",
     "/stats/top20users",
-    "/stats/top20messages"
+    "/stats/top20messages",
+    "/stats/influence"
 })
 public class StatsController extends HttpServlet {
 
@@ -80,6 +81,19 @@ public class StatsController extends HttpServlet {
                 
                 req.setAttribute("current_page", current_page);
                 dispatcher = req.getRequestDispatcher("/views/stats/top20messages.jsp");
+                dispatcher.forward(req, res);
+                break;
+                
+            case "/stats/influence":
+                s = new Stats();
+                try {
+                    req.setAttribute("users", s.influence(req.getParameter("user")));
+                } catch (SQLException ex) {
+                    Logger.getLogger(StatsController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
+                req.setAttribute("current_page", current_page);
+                dispatcher = req.getRequestDispatcher("/views/stats/influence.jsp");
                 dispatcher.forward(req, res);
                 break;
         }

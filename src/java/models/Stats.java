@@ -53,4 +53,29 @@ public class Stats extends ActiveRecord {
         }
         return messages;
     }
+    
+    public List<User> influence(String uid_raw) throws SQLException {
+        int uid = new Integer(uid_raw);
+        List<User> users = new LinkedList<>();
+        User user;
+        int id;
+        try (PreparedStatement stmt = conn.prepareStatement("SELECT DISTINCT ON (login) * FROM \"follow\" LEFT JOIN \"user\" ON id = follower_id WHERE followed_id IN\n" +
+"(SELECT DISTINCT id FROM \"follow\" LEFT JOIN \"user\" ON id = follower_id WHERE followed_id = ?)\n" +
+"OR followed_id = ?;");) {
+            stmt.setInt(1, uid);
+            stmt.setInt(2, uid);
+            try (ResultSet result = stmt.executeQuery();) {
+                while (result.next()) {
+                    id = result.getInt("id");
+                    if (id != uid) {
+                        user = new User();
+                        user.setId(id);
+                        user.setName(result.getString("name"));
+                        users.add(user);
+                    }
+                }
+            }
+        }
+        return users;
+    }
 }

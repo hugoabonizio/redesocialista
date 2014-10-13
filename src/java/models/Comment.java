@@ -59,5 +59,13 @@ public class Comment extends ActiveRecord {
     public Timestamp getComment_date() {
         return comment_date;
     }
+
+    public int getServer_id() {
+        return server_id;
+    }
+
+    public void setServer_id(int server_id) {
+        this.server_id = server_id;
+    }
     
 }

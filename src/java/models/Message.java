@@ -21,6 +21,7 @@ public class Message extends ActiveRecord {
     private int original_message_id;
     private String body;
     private Timestamp message_date;
+    private int server_id;
     
     public List<MessagePOJO> timeline_messages() throws Exception {
         List<Object> messages = new ArrayList<Object>();
@@ -205,6 +206,14 @@ public class Message extends ActiveRecord {
 
     public void setOriginal_message_id(int original_message_id) {
         this.original_message_id = original_message_id;
+    }
+
+    public int getServer_id() {
+        return server_id;
+    }
+
+    public void setServer_id(int server_id) {
+        this.server_id = server_id;
     }
     
 }

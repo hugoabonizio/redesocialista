@@ -7,8 +7,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.RequestDispatcher;
@@ -17,6 +22,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import libs.ActiveRecord;
 import models.*;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -55,7 +61,8 @@ public class WebserviceController extends HttpServlet {
                     // POSTS
                     PostJSON post;
                     for (MessagePOJO message: (new Message()).getMessagesFrom(-1, 100)) {
-                        if (message.getMessage().getOriginal_message_id() == message.getMessage().getId()) {
+                        if (message.getMessage().getOriginal_message_id() == message.getMessage().getId()
+                            && message.getMessage().getServer_id() == 0) {
                             post = new PostJSON();
                             post.id = message.getMessage().getId();
                             post.id_usuario = message.getMessage().getUser_id();
@@ -69,7 +76,8 @@ public class WebserviceController extends HttpServlet {
                     // REPOSTS
                     RepostJSON repost;
                     for (MessagePOJO message: (new Message()).getMessagesFrom(-1, 100)) {
-                        if (message.getMessage().getOriginal_message_id() != message.getMessage().getId()) {
+                        if (message.getMessage().getOriginal_message_id() != message.getMessage().getId()
+                            && message.getMessage().getServer_id() == 0) {
                             repost = new RepostJSON();
                             repost.id = message.getMessage().getId();
                             repost.id_usuario = message.getMessage().getUser_id();
@@ -101,7 +109,7 @@ public class WebserviceController extends HttpServlet {
                     // COMENTARIOS
                     ComentarioJSON comentario;
                     int i = 1;
-                    for (Comment comment: (new Comment()).getComments("1 OR 1=1 AND server_id IS NULL")) {
+                    for (Comment comment: (new Comment()).getComments("1 OR 1=1 AND (server_id IS NULL OR server_id = 0)")) {
                         comentario = new ComentarioJSON();
                         comentario.id = i++;
                         comentario.id_usuario = comment.getUser_id();
@@ -143,11 +151,105 @@ public class WebserviceController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         RequestDispatcher dispatcher;
         
+        Map<Integer, Integer> mapUserId = new TreeMap<>();
+        Map<Integer, Integer> mapMessageId = new TreeMap<>();
+        Map<Integer, String> mapMessageBody = new TreeMap<>();
+        
         switch (request.getServletPath()) {
             case "/importar":
                 String url = request.getParameter("url");
                 Pacote pacote = importFromURL(url);
                 
+                try {
+                    // DELETA DADOS DO SERVIDOR
+                    PreparedStatement stmt = (new ActiveRecord()).conn.prepareStatement(
+                            "DELETE FROM \"user\" WHERE server_id = " + pacote.id_servidor + ";"
+                          + "DELETE FROM \"message\" WHERE server_id = " + pacote.id_servidor + ";"
+                          + "DELETE FROM \"comment\" WHERE server_id = " + pacote.id_servidor + ";"
+                          + "DELETE FROM \"like\" WHERE server_id = " + pacote.id_servidor + ";"
+                    );
+                    stmt.execute();
+                    
+                    // IMPORTAR
+                    
+                    // USER
+                    User user;
+                    for (UsuarioJSON usuario: pacote.usuarios) {
+                        user = new User();
+                        user.setLogin(usuario.login + "_" + pacote.id_servidor);
+                        user.setName(usuario.nome);
+                        user.setBirth(new Date(usuario.nascimento.getTime()));
+                        user.setDescription(usuario.descricao);
+                        user.setServer_id(pacote.id_servidor);
+                        user.setPassword("senha");
+                        user.save(true);
+                        mapUserId.put(usuario.id, user.getId());
+                    }
+                    
+                    // MESSAGE
+                    Message message;
+                    for (PostJSON post: pacote.posts) {
+                        message = new Message();
+                        message.setBody(post.conteudo);
+                        message.setMessage_date(new Timestamp(post.data.getTime()));
+                        message.setUser_id(mapUserId.get(post.id_usuario));
+                        message.setOriginal_user_id(mapUserId.get(post.id_usuario));
+                        message.setServer_id(pacote.id_servidor);
+                        message.save(true);
+                        mapMessageId.put(post.id, message.getId());
+                        mapMessageBody.put(post.id, post.conteudo);
+                    }
+                    
+                    // MESSAGE (REPOST)
+                    for (RepostJSON post: pacote.reposts) {
+                        message = new Message();
+                        message.setBody(mapMessageBody.get(post.id_post));
+                        message.setMessage_date(new Timestamp(post.data.getTime()));
+                        message.setUser_id(mapUserId.get(post.id_usuario));
+                        message.setOriginal_user_id(mapUserId.get(post.id_usuario));
+                        message.setOriginal_message_id(mapMessageId.get(post.id_post));
+                        message.setServer_id(pacote.id_servidor);
+                        message.save(true);
+                        mapMessageId.put(post.id, message.getId());
+                    }
+                    
+                    // COMMENT
+                    Comment comment;
+                    for (ComentarioJSON comentario: pacote.comentarios) {
+                        comment = new Comment();
+                        comment.setBody(comentario.conteudo);
+                        comment.setUser_id(mapUserId.get(comentario.id_usuario));
+                        comment.setMessage_id(mapMessageId.get(comentario.id_post));
+                        comment.setServer_id(pacote.id_servidor);
+                        comment.save();
+                    }
+                    
+                    // LIKE
+                    Like like;
+                    for (LikeJSON likejson: pacote.likes) {
+                        like = new Like();
+                        like.setMessage_id(mapMessageId.get(likejson.id_post));
+                        like.setUser_id(mapUserId.get(likejson.id_usuario));
+                        like.setValue(1);
+                        like.setServer_id(pacote.id_servidor);
+                        like.save();
+                    }
+                    
+                    // LIKE (DISLIKE)
+                    for (DislikeJSON likejson: pacote.dislikes) {
+                        like = new Like();
+                        like.setMessage_id(mapMessageId.get(likejson.id_post));
+                        like.setUser_id(mapUserId.get(likejson.id_usuario));
+                        like.setValue(-1);
+                        like.setServer_id(pacote.id_servidor);
+                        like.save();
+                    }
+                    
+                } catch (SQLException ex) {
+                    Logger.getLogger(WebserviceController.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (Exception ex) {
+                    Logger.getLogger(WebserviceController.class.getName()).log(Level.SEVERE, null, ex);
+                }
                 try (PrintWriter out = response.getWriter()) {
                     gson.toJson(pacote, out);
                 }

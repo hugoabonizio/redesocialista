@@ -13,14 +13,15 @@ public class Like extends ActiveRecord {
     private int user_id;
     private int value;
     private Timestamp created_at;
+    private int server_id;
     
     public void like() throws SQLException {
-        value = 1;
+        setValue(1);
         save();
     }
     
     public void dislike() throws SQLException {
-        value = -1;
+        setValue(-1);
         save();
     }
     
@@ -28,7 +29,7 @@ public class Like extends ActiveRecord {
         List<Object> likes = new ArrayList<Object>();
         
         try {
-            transfer(likes);
+            where("server_id IS NULL OR server_id = 0").transfer(likes);
 
             List<Like> likes_cast = new ArrayList<Like>();
             for (Object obj: likes) {
@@ -61,11 +62,12 @@ public class Like extends ActiveRecord {
     
     @Override
     public void save() throws SQLException {
-        PreparedStatement stmt = conn.prepareStatement("INSERT INTO \"like\" (message_id, user_id, value) VALUES (?, ?, ?)");
+        PreparedStatement stmt = conn.prepareStatement("INSERT INTO \"like\" (message_id, user_id, value, server_id) VALUES (?, ?, ?, ?)");
         stmt.setInt(1, message_id);
         stmt.setInt(2, user_id);
         stmt.setInt(3, getValue());
-        System.out.println("INSERT INTO like (message_id, user_id, value) VALUES (?, ?, ?)");
+        stmt.setInt(4, server_id);
+        System.out.println(stmt);
         stmt.execute();
     }
 
@@ -89,5 +91,17 @@ public class Like extends ActiveRecord {
 
     public Timestamp getCreated_at() {
         return created_at;
+    }
+
+    public int getServer_id() {
+        return server_id;
+    }
+
+    public void setServer_id(int server_id) {
+        this.server_id = server_id;
+    }
+
+    public void setValue(int value) {
+        this.value = value;
     }
 }
